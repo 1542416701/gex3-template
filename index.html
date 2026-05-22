@@ -1,37 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ghibli Park Itinerary Builder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet">
-
-  <!-- Vue CDN -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-  <style>
-    
-
-  </style>
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
-
-<body>
+<body class="totoro-theme">
   
+  <div id="v-app-8" class="container-fluid py-5">
+    <div class="row justify-content-center">
+      <div class="col-xl-7 col-lg-8 col-md-10 col-12">
+        
+        <h1 class="text-center page-title mb-4">Ghibli Park Itinerary Builder</h1>
+        
+        <form id="tour-form" @submit.prevent="executeBuild" novalidate>
+          <div class="accordion my-accordion" id="acc-8">
+            
+            <!-- Item 1 -->
+            <article class="accordion-item single-panel">
+              <header class="accordion-header" id="hd-1">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bd-1" aria-expanded="false" aria-controls="bd-1">
+                  Personal Details
+                </button>
+              </header>
+              <div id="bd-1" class="accordion-collapse collapse" aria-labelledby="hd-1" data-bs-parent="#acc-8">
+                <div class="accordion-body panel-bg">
+                  <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-3">
+                      <label class="form-label strong-lbl">Full Name</label>
+                      <input type="text" class="form-control std-inp" v-model="in_name">
+                      <span class="err-txt" v-if="errs.in_name">{{ errs.in_name }}</span>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                      <label class="form-label strong-lbl">Date of Birth</label>
+                      <input type="date" class="form-control std-inp" v-model="in_dob">
+                      <span class="err-txt" v-if="errs.in_dob">{{ errs.in_dob }}</span>
+                    </div>
+                    <div class="col-lg-4 col-md-12 mb-3">
+                      <label class="form-label strong-lbl">Gender</label>
+                      <div class="mt-2">
+                        <label class="me-3">
+                          <input class="form-check-input" type="radio" value="Male" v-model="in_sex"> Male
+                        </label>
+                        <label>
+                          <input class="form-check-input" type="radio" value="Female" v-model="in_sex"> Female
+                        </label>
+                      </div>
+                      <span class="err-txt d-block" v-if="errs.in_sex">{{ errs.in_sex }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
 
-  <!-- Bootstrap JS Bundle: needed for accordion behavior -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-  </script>
+            <!-- Item 2 -->
+            <article class="accordion-item single-panel">
+              <header class="accordion-header" id="hd-2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bd-2" aria-expanded="false" aria-controls="bd-2">
+                  Ghibli Park Selection
+                </button>
+              </header>
+              <div id="bd-2" class="accordion-collapse collapse" aria-labelledby="hd-2" data-bs-parent="#acc-8">
+                <div class="accordion-body panel-bg">
+                  
+                  <div v-if="loading" class="text-center my-4">
+                    <div class="spinner-border text-success"></div>
+                  </div>
+                  
+                  <div v-else-if="err_fetch" class="alert alert-danger">
+                    {{ err_fetch }}
+                  </div>
+                  
+                  <div v-else>
+                    <p class="mb-3 text-secondary" style="font-size: 0.9rem;">Click a place to select it. Click it again to deselect it.</p>
+                    
+                    <div class="pink-alert mb-3" v-if="errs.in_parks">
+                      Please select at least one Ghibli Park place.
+                    </div>
 
-  <script>
-  
-  </script>
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+                      <div class="col" v-for="p in parks" :key="p.id">
+                        <div class="card h-100 p-card" 
+                             :class="{ 'p-selected': hasPark(p.id) }"
+                             @click="togglePark(p)">
+                          <img :src="p.image" class="card-img-top object-fit-cover" alt="img" style="height: 180px;">
+                          <div class="card-body p-3">
+                            <h6 class="card-title fw-bold">{{ p.name }}</h6>
+                            <p class="card-text text-muted" style="font-size: 0.85rem;">{{ p.description }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
+                </div>
+              </div>
+            </article>
+
+            <!-- Item 3 -->
+            <article class="accordion-item single-panel">
+              <header class="accordion-header" id="hd-3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bd-3" aria-expanded="false" aria-controls="bd-3">
+                  Visitors Details
+                </button>
+              </header>
+              <div id="bd-3" class="accordion-collapse collapse" aria-labelledby="hd-3" data-bs-parent="#acc-8">
+                <div class="accordion-body panel-bg">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label strong-lbl">Total Visitors</label>
+                      <input type="number" class="form-control std-inp" min="1" v-model="in_total">
+                      <span class="err-txt" v-if="errs.in_total">{{ errs.in_total }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label strong-lbl">Number of Children</label>
+                      <input type="number" class="form-control std-inp" min="0" v-model="in_kids">
+                      <span class="err-txt" v-if="errs.in_kids">{{ errs.in_kids }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Item 4 -->
+            <article class="accordion-item single-panel">
+              <header class="accordion-header" id="hd-4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bd-4" aria-expanded="false" aria-controls="bd-4">
+                  Accommodation
+                </button>
+              </header>
+              <div id="bd-4" class="accordion-collapse collapse" aria-labelledby="hd-4" data-bs-parent="#acc-8">
+                <div class="accordion-body panel-bg">
+                  <div class="mb-3">
+                    <select class="form-select std-inp" v-model="in_hotel">
+                      <option value="" disabled>-- Choose accommodation --</option>
+                      <option v-for="h in hotel_opts" :key="h" :value="h">
+                        {{ h }}
+                      </option>
+                    </select>
+                    <span class="err-txt" v-if="errs.in_hotel">{{ errs.in_hotel }}</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Item 5 -->
+            <article class="accordion-item single-panel">
+              <header class="accordion-header" id="hd-5">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bd-5" aria-expanded="false" aria-controls="bd-5">
+                  Payment Details
+                </button>
+              </header>
+              <div id="bd-5" class="accordion-collapse collapse" aria-labelledby="hd-5" data-bs-parent="#acc-8">
+                <div class="accordion-body panel-bg">
+                  <div class="row">
+                    <div class="col-sm-6 mb-3">
+                      <label class="form-label strong-lbl">Name on Card</label>
+                      <input type="text" class="form-control std-inp" v-model="in_cc_name">
+                      <span class="err-txt" v-if="errs.in_cc_name">{{ errs.in_cc_name }}</span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                      <label class="form-label strong-lbl">Card Number</label>
+                      <input type="text" class="form-control std-inp" v-model="in_cc_num">
+                      <span class="err-txt" v-if="errs.in_cc_num">{{ errs.in_cc_num }}</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 mb-3">
+                      <label class="form-label strong-lbl">Expiration Date</label>
+                      <input type="month" class="form-control std-inp" v-model="in_cc_exp">
+                      <span class="err-txt" v-if="errs.in_cc_exp">{{ errs.in_cc_exp }}</span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                      <label class="form-label strong-lbl">CVC</label>
+                      <input type="password" class="form-control std-inp" v-model="in_cc_cvc">
+                      <span class="err-txt" v-if="errs.in_cc_cvc">{{ errs.in_cc_cvc }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+          </div>
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-action px-5">Generate Itinerary</button>
+          </div>
+
+          <div v-if="err_global" class="pink-alert mt-4 text-center">
+            {{ err_global }}
+          </div>
+        </form>
+
+        <!-- Summary -->
+        <div v-if="show_res" class="card mt-5 border-0 shadow-sm res-card">
+          <div class="card-header bg-transparent border-0 pt-4 pb-0">
+            <h3 class="mb-0 text-success fw-bold">Your Ghibli Park Itinerary</h3>
+          </div>
+          <div class="card-body px-4 pb-4 res-text">
+            
+            <h6 class="fw-bold mb-1">Personal Details</h6>
+            <p class="mb-1"><strong>Name:</strong> {{ in_name }}</p>
+            <p class="mb-1"><strong>Gender:</strong> {{ in_sex }}</p>
+            <p class="mb-3"><strong>Date of Birth:</strong> {{ in_dob }}</p>
+
+            <h6 class="fw-bold mb-1">Selected Park Places</h6>
+            <ul class="list-unstyled mb-3 ms-3">
+              <li v-for="sel in in_parks" :key="sel.id">
+                • {{ sel.name }}
+              </li>
+            </ul>
+
+            <h6 class="fw-bold mb-1">Visitors Details</h6>
+            <p class="mb-1"><strong>Total Visitors:</strong> {{ in_total }}</p>
+            <p class="mb-3"><strong>Children:</strong> {{ in_kids }}</p>
+
+            <h6 class="fw-bold mb-1">Accommodation</h6>
+            <p class="mb-3"><strong>Selected Option:</strong> {{ in_hotel }}</p>
+
+            <h6 class="fw-bold mb-1">Payment Details</h6>
+            <p class="mb-1"><strong>Name on Card:</strong> {{ in_cc_name }}</p>
+
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
 </body>
-
 </html>

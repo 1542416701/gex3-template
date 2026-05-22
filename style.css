@@ -1,0 +1,145 @@
+@font-face {
+  font-family: 'StudioGhibliFont';
+  src: url('assets/fonts/Luna.ttf') format('truetype');
+}
+
+.totoro-theme {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('assets/bg-totoro.jpg');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+.page-title {
+  font-family: 'StudioGhibliFont', sans-serif;
+  color: rgb(163, 247, 163);
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.my-accordion {
+  border-radius: 5px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.single-panel {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.single-panel:last-child {
+  border-bottom: none;
+}
+
+.accordion-header {
+  background: transparent;
+}
+
+/* Using nth-child instead of IDs for totally different CSS parsing */
+.my-accordion .single-panel:nth-child(1) .accordion-button { background-image: url('assets/acc-bg1.png'); }
+.my-accordion .single-panel:nth-child(2) .accordion-button { background-image: url('assets/acc-bg2.png'); }
+.my-accordion .single-panel:nth-child(3) .accordion-button { background-image: url('assets/acc-bg3.png'); }
+.my-accordion .single-panel:nth-child(4) .accordion-button { background-image: url('assets/acc-bg4.png'); }
+.my-accordion .single-panel:nth-child(5) .accordion-button { background-image: url('assets/acc-bg5.png'); }
+
+.accordion-button {
+  background-color: transparent !important;
+  color: rgb(245, 222, 179) !important;
+  font-family: 'StudioGhibliFont', sans-serif;
+  font-size: 1.5rem;
+  border: none;
+  box-shadow: none !important;
+  padding: 20px;
+  background-position: center;
+  background-size: cover;
+}
+
+.accordion-button::after {
+  filter: invert(1);
+}
+
+.accordion-button:not(.collapsed) {
+  color: rgb(163, 247, 163) !important;
+  background-color: transparent !important;
+}
+
+.panel-bg {
+  background-color: rgb(253, 245, 230);
+  color: #333;
+  padding: 20px;
+}
+
+.strong-lbl {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.std-inp {
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+}
+
+.std-inp:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.p-card {
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.p-selected {
+  border: 4px solid #4caf50 !important;
+}
+
+.btn-action {
+  font-family: 'StudioGhibliFont', sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+  background-color: rgb(46, 139, 87);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 30px;
+  transition: 0.3s;
+}
+
+.btn-action:hover {
+  background-color: rgb(31, 107, 64);
+  color: #fff;
+}
+
+.err-txt {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85em;
+  color: rgb(169, 68, 66);
+}
+
+.pink-alert {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: rgb(169, 68, 66);
+  background-color: rgb(255, 192, 203);
+}
+
+.res-card {
+  background-color: rgb(232, 245, 233);
+  border-radius: 10px;
+}
+
+.res-text p, .res-text li {
+  font-size: 0.9rem;
+}
